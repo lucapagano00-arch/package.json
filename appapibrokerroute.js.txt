@@ -1,0 +1,16 @@
+export async function POST(req) {
+  const { symbol, qty, side } = await req.json();
+
+  const res = await fetch("https://paper-api.alpaca.markets/v2/orders", {
+    method: "POST",
+    headers: {
+      "APCA-API-KEY-ID": process.env.ALPACA_API_KEY,
+      "APCA-API-SECRET-KEY": process.env.ALPACA_SECRET_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ symbol, qty, side, type: "market", time_in_force: "gtc" })
+  });
+
+  const data = await res.json();
+  return Response.json(data);
+}

@@ -1,0 +1,58 @@
+"use client";
+import { useState } from "react";
+
+export default function Home() {
+  const [result, setResult] = useState(null);
+  const [signal, setSignal] = useState(null);
+  const [portfolio, setPortfolio] = useState(null);
+
+  const prices = [45, 50, 48, 52, 55];
+
+  const optimize = async () => {
+    const res = await fetch("/api/optimize", {
+      method: "POST",
+      body: JSON.stringify({ assets: ["IMO", "XOM", "CVX"] })
+    });
+    setResult(await res.json());
+  };
+
+  const getSignal = async () => {
+    const res = await fetch("/api/signals", {
+      method: "POST",
+      body: JSON.stringify({ prices })
+    });
+    setSignal(await res.json());
+  };
+
+  const trade = async (type) => {
+    const res = await fetch("/api/trade", {
+      method: "POST",
+      body: JSON.stringify({
+        symbol: "IMO",
+        signal: type,
+        price: prices[prices.length - 1]
+      })
+    });
+    setPortfolio(await res.json());
+  };
+
+  return (
+    <main style={{ padding: 40, fontFamily: "Arial" }}>
+      <h1>Quant Platform</h1>
+
+      <button onClick={optimize}>Optimize Portfolio</button>
+      {result && <pre>{JSON.stringify(result, null, 2)}</pre>}
+
+      <hr />
+
+      <button onClick={getSignal}>Generate Signal</button>
+      {signal && <pre>{JSON.stringify(signal, null, 2)}</pre>}
+
+      <hr />
+
+      <button onClick={() => trade("BUY")}>BUY</button>
+      <button onClick={() => trade("SELL")}>SELL</button>
+      {portfolio && <pre>{JSON.stringify(portfolio, null, 2)}</pre>}
+    </main>
+  );
+}

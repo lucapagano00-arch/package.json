@@ -1,0 +1,22 @@
+let portfolio = {
+  cash: 100000,
+  positions: {}
+};
+
+export async function POST(req) {
+  const { symbol, signal, price } = await req.json();
+
+  if (!portfolio.positions[symbol]) portfolio.positions[symbol] = 0;
+
+  if (signal === "BUY" && portfolio.cash > price) {
+    portfolio.positions[symbol] += 1;
+    portfolio.cash -= price;
+  }
+
+  if (signal === "SELL" && portfolio.positions[symbol] > 0) {
+    portfolio.positions[symbol] -= 1;
+    portfolio.cash += price;
+  }
+
+  return Response.json(portfolio);
+}
